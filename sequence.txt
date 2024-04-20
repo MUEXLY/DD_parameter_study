@@ -1,0 +1,22 @@
+ *** Selection ***
+1 : Change Temperature
+2 : Change Dislocation Length
+3 : Change distance between dislocations
+4 : Change alloy
+5 : Change Dislocation Character (edge vs screw)
+6 : Change Lengevin Noise (Deactivate vs Activate)
+7 : Change Gauss Quadrature Points Density
+8 : Change Remesh Frequency
+9 : Change Discretization Number of Points
+10 : Change External Stress Rate
+11 : Change the seed number for noise sampling
+12 : Change dislocation position
+13 : Change dipole glide steps
+14 : Change max segment length for remesh (Lmax)
+15 : Change initial stress applied to the system
+16 : Change solid solution noise mode
+17 : Change stacking fault noise mode
+18 : Change grid size
+
+python main.py testData 1 2 3 4 5 6 7 11 12 13 16 17 15 18
+python main.py NodeDensityStudy 1 2 3 4 5 6 7 9 11 12 13 16 17 18 15

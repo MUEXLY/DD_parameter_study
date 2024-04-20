@@ -1,0 +1,7 @@
+{
+    "mainMoDELibDirectory": "/home/anon/Documents/Research/Github/MoDELib2_Final/MoDELib2/",
+    "dataOutPutDirectory": "/home/anon/Documents/Research/Github/MoDELib2_Final/MoDELib2/tutorials/DislocationDynamics/periodicDomains/",
+    "totalTimeSteps": 50000,
+    "parametersToExplore": "LT IES GP",
+    "paramtersToCouple": ""
+}
