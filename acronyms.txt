@@ -16,3 +16,4 @@ IES : Initial external stress
 SS : Solid Solution Noise
 SF : Stacking Fault Noise
 GS : Grid Size
+LT : line tension
