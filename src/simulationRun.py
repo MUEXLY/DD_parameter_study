@@ -53,6 +53,7 @@ class dislocationDynamicsRun:
         #paramList = self.structure.configFile['parametersToExplore']
         paramToCouple = self.structure.configFile['paramtersToCouple']
         timeStep = self.structure.configFile['totalTimeSteps']
+        workingSimPath = f'{modelibPath}/tutorials/DislocationDynamics/periodicDomains/uniformLoadController/'
 
         # remove the dictionary emlements that are empty
         keysToRemove = [key for key,values in self.testRange.items() if not values] # keys to remove
@@ -93,12 +94,30 @@ class dislocationDynamicsRun:
             # generate microstructure
             self.generateMicrostructure()
             # run simulation
-            self.runDislocationDynamics()
+            self.runDislocationDynamics(parameters)
+            # detect CRSS
+            #self.detectCRSS(parameters)
             # copy the finished data to the output directory
-            self.copyDataToOutputDir(parameters, outputPath)
+            self.copyDataToOutputDir(parameters, outputPath, workingSimPath)
 
-    def copyDataToOutputDir(self, parameters: dict, outputPath: str):
-        folderName = ''.join()
+    def copyDataToOutputDir(self, parameters: dict, outputPath: str, workingSimPath: str):
+        # create directory name based on the parameters
+        name = []
+        for key, value in parameters.items():
+            name.append(f'{key}')
+            if type(value) == list:
+                for val in value:
+                    name.append(f'{val}')
+            else:
+                name.append(f'{value}')
+        folderName = ''.join(name)
+
+        # copy the data to the output directory
+        # Copy the entire folder
+        folderToCopy = ['evl', 'F', 'inputFiles']
+        for folder in folderToCopy:
+            shutil.copytree(f'{workingSimPath}/{folder}', f'{outputPath}/{folderName}/{folder}', dirs_exist_ok=True)
+        exit()
 
     def generateMicrostructure(self):
         modelibPath = self.structure.configFile['mainMoDELibDirectory']
@@ -128,7 +147,8 @@ class dislocationDynamicsRun:
         # change the working directory from the simulation working dir to the original dir
         os.chdir(runtimeDir)
 
-    def runDislocationDynamics(self):
+    def runDislocationDynamics(self, parameters: dict):
+        print(f'currently running simulation with parameters... : {parameters}')
         modelibPath = self.structure.configFile['mainMoDELibDirectory']
         binaryFile = f'{modelibPath}/tools/DDomp/build/DDomp'
         workingSimPath = f'{modelibPath}/tutorials/DislocationDynamics/periodicDomains/uniformLoadController/'
