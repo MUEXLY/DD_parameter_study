@@ -4,6 +4,6 @@
     "totalTimeSteps": 20000,
     "paramtersToCouple": "",
     "microstructureFileToUse": "periodicDipole.txt",
-    "enablePartial": 1,
+    "slipSystemType": "Schockley",
     "loadType": "ExternalStress0"
 }

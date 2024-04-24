@@ -23,7 +23,7 @@ class dislocationDynamicsRun:
         microStructLibPath = f'{modelibPath}/tutorials/DislocationDynamics/MicrostructureLibrary'
         materialLibPath = f'{modelibPath}/tutorials/DislocationDynamics/MaterialsLibrary'
         externalLoadMode = self.structure.configFile['loadType']
-        partial = self.structure.configFile['enablePartial']
+        slipSystemType = self.structure.configFile['slipSystemType']
 
         # remove the dictionary emlements that are empty
         keysToRemove = [key for key,values in self.testRange.items() if not values] # keys to remove
@@ -65,8 +65,8 @@ class dislocationDynamicsRun:
             # change parameters
             self.changeParameters(parameters, modelibPath, inputFilePath, microStructLibPath)
             # if partial is enabled, make the change on the material file
-            if partial:
-                self.enablePartial(parameters, materialLibPath)
+            self.setSlipSystemType(parameters, materialLibPath, slipSystemType)
+            exit()
             # set time step
             self.setTimeStep(timeStep, modelibPath, inputFilePath)
             # test various stress/stressRate/strain/strainRate
@@ -123,10 +123,26 @@ class dislocationDynamicsRun:
         # create directory name based on the parameters
         name = []
         for key, value in parameters.items():
-            name.append(f'{key}')
+            match key:
+                case 'temperature':
+                    acronym = 'T'
+                case 'alloy':
+                    acronym = 'A'
+                case 'lineTension':
+                    acronym = 'LT'
+                case 'boxSize':
+                    acronym = 'BS'
+                #case 'periodicDipoleSlipSystemIDs':
+                #    acronym = 'PDSS'
+                #case 'periodicDipoleExitFaceIDs':
+                case 'periodicDipoleNodes':
+                    acronym = 'N'
+                case 'periodicDipolePoints':
+                    acronym = 'P'
+            name.append(f'{acronym}')
             if type(value) == list:
                 for val in value:
-                    name.append(f'{val}')
+                    name.append(f'{val.strip()}')
             else:
                 name.append(f'{value}')
         folderName = ''.join(name)
@@ -246,20 +262,26 @@ class dislocationDynamicsRun:
         # change the current working directory back to the original
         os.chdir(runtimeDir)
 
-    def enablePartial(self, paramDictionary: dict, materialLibPath: str):
+    def setSlipSystemType(self, paramDictionary: dict, materialLibPath: str, slipSystemType: str) -> None:
         for key, value in paramDictionary.items():
             match key:
                 case 'alloy':
-                    pattern = f'enablePartials.*'
-                    replace = f'enablePartials=1;'
+                    pattern = f'enabledSlipSystems.*'
+                    replace = f'enabledSlipSystems={slipSystemType};'
                     filePath = f'{materialLibPath}/{value}.txt'
         with open(filePath, 'r') as file:
             text = file.read()
         # replace the pattern with the new value
-        text = re.sub(pattern, replace, text)
-        # overwrite the original data file
-        with open(filePath, 'w') as file:
-            file.write(text)
+        if re.search(pattern, text):
+            text = re.sub(pattern, replace, text)
+            # overwrite the original data file
+            with open(filePath, 'w') as file:
+                file.write(text)
+        # if there is no enabledSlipSystem declaration, add it to the file
+        else:
+            with open(filePath, 'w') as file:
+                file.write(text)
+                file.write(f'{replace}')
 
     def changeParameters(self, paramDictionary: dict, modelibPath: str, inputFilePath: str, microStructLibPath: str) -> None:
         for key, value in paramDictionary.items():

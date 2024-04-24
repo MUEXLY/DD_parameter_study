@@ -8,7 +8,7 @@ testRange = {
         [100,100,1000]
         ],
     'periodicDipoleSlipSystemIDs' : [
-        '0 0',
+        '0 1',
     ],
     'periodicDipoleExitFaceIDs': [
         '1 1',
