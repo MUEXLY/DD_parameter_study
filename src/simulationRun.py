@@ -66,7 +66,6 @@ class dislocationDynamicsRun:
             self.changeParameters(parameters, modelibPath, inputFilePath, microStructLibPath)
             # if partial is enabled, make the change on the material file
             self.setSlipSystemType(parameters, materialLibPath, slipSystemType)
-            exit()
             # set time step
             self.setTimeStep(timeStep, modelibPath, inputFilePath)
             # test various stress/stressRate/strain/strainRate
