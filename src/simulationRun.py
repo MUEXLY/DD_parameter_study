@@ -21,7 +21,9 @@ class dislocationDynamicsRun:
         timeStep = self.structure.configFile['totalTimeSteps']
         workingSimPath = f'{modelibPath}/tutorials/DislocationDynamics/periodicDomains/uniformLoadController/'
         microStructLibPath = f'{modelibPath}/tutorials/DislocationDynamics/MicrostructureLibrary'
+        materialLibPath = f'{modelibPath}/tutorials/DislocationDynamics/MaterialsLibrary'
         externalLoadMode = self.structure.configFile['loadType']
+        partial = self.structure.configFile['enablePartial']
 
         # remove the dictionary emlements that are empty
         keysToRemove = [key for key,values in self.testRange.items() if not values] # keys to remove
@@ -56,12 +58,15 @@ class dislocationDynamicsRun:
             os.system(f'rm -rf {workingSimPath}/F')
         if os.path.exists(f'{workingSimPath}/evl'):
             os.system(f'rm -rf {workingSimPath}/evl')
-
+        
         # run simulations with the parameters saved on each list
         # (?) do I need to clean up the old data automatically?
         for parameters in paramDictList:
             # change parameters
             self.changeParameters(parameters, modelibPath, inputFilePath, microStructLibPath)
+            # if partial is enabled, make the change on the material file
+            if partial:
+                self.enablePartial(parameters, materialLibPath)
             # set time step
             self.setTimeStep(timeStep, modelibPath, inputFilePath)
             # test various stress/stressRate/strain/strainRate
@@ -240,6 +245,21 @@ class dislocationDynamicsRun:
             exec(file.read())
         # change the current working directory back to the original
         os.chdir(runtimeDir)
+
+    def enablePartial(self, paramDictionary: dict, materialLibPath: str):
+        for key, value in paramDictionary.items():
+            match key:
+                case 'alloy':
+                    pattern = f'enablePartials.*'
+                    replace = f'enablePartials=1;'
+                    filePath = f'{materialLibPath}/{value}.txt'
+        with open(filePath, 'r') as file:
+            text = file.read()
+        # replace the pattern with the new value
+        text = re.sub(pattern, replace, text)
+        # overwrite the original data file
+        with open(filePath, 'w') as file:
+            file.write(text)
 
     def changeParameters(self, paramDictionary: dict, modelibPath: str, inputFilePath: str, microStructLibPath: str) -> None:
         for key, value in paramDictionary.items():

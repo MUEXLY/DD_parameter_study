@@ -40,31 +40,31 @@ class structure:
             for line in dummyData:
                 g.write(line)
 
-    def changeMaterial(self):
-        modelibPath = self.configFile['mainMoDELibDirectory']
-        microStructureToUse = self.configFile['microstructureFileToUse']
-        inputFilePath = f'{modelibPath}/tutorials/DislocationDynamics/periodicDomains/uniformLoadController/inputFiles/'
-        print("Generating polycrystal...")
-        materialFile = self.configFile['materialFileToUse']
-        dummyData = []
-        with open(f'{inputFilePath}/generateInputFiles.py', 'r') as f:
-            for line in f:
-                # Strip the line of leading and trailing whitespace
-                stripped_line = line.strip()
-                # Check if the line is blank
-                if not stripped_line:
-                    dummyData.append('\n') # add a blank line to the list
-                    continue;
-                if 'MaterialsLibrary' in line:
-                    data = f"pf=PolyCrystalFile('../../../MaterialsLibrary/{materialFile}');\n"
-                else:
-                    data = line
-                # store original data
-                dummyData.append(data)
-        # overwrite the original data file
-        with open(f'{inputFilePath}/generateInputFiles.py', 'w') as g:
-            for line in dummyData:
-                g.write(line)
+    #def changeMaterial(self):
+    #    modelibPath = self.configFile['mainMoDELibDirectory']
+    #    microStructureToUse = self.configFile['microstructureFileToUse']
+    #    inputFilePath = f'{modelibPath}/tutorials/DislocationDynamics/periodicDomains/uniformLoadController/inputFiles/'
+    #    print("Generating polycrystal...")
+    #    materialFile = self.configFile['materialFileToUse']
+    #    dummyData = []
+    #    with open(f'{inputFilePath}/generateInputFiles.py', 'r') as f:
+    #        for line in f:
+    #            # Strip the line of leading and trailing whitespace
+    #            stripped_line = line.strip()
+    #            # Check if the line is blank
+    #            if not stripped_line:
+    #                dummyData.append('\n') # add a blank line to the list
+    #                continue;
+    #            if 'MaterialsLibrary' in line:
+    #                data = f"pf=PolyCrystalFile('../../../MaterialsLibrary/{materialFile}');\n"
+    #            else:
+    #                data = line
+    #            # store original data
+    #            dummyData.append(data)
+    #    # overwrite the original data file
+    #    with open(f'{inputFilePath}/generateInputFiles.py', 'w') as g:
+    #        for line in dummyData:
+    #            g.write(line)
         # change the current working directory to inputFiles
         #runtimeDir = os.getcwd()
         #os.chdir(f'{inputFilePath}')

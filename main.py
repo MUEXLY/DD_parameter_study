@@ -14,12 +14,12 @@ def main():
     configFile = "config.json"
     with open(configFile) as f:
         config = json.load(f)
-    modelibPath = config['mainMoDELibDirectory']
-    outputPath = config['dataOutPutDirectory']
-    totalTsteps = config['totalTimeSteps']
-    paramToCouple = config['paramtersToCouple']
-    microStructure = config['microstructureFileToUse']
-    partial = config['enablePartial']
+    #modelibPath = config['mainMoDELibDirectory']
+    #outputPath = config['dataOutPutDirectory']
+    #totalTsteps = config['totalTimeSteps']
+    #paramToCouple = config['paramtersToCouple']
+    #microStructure = config['microstructureFileToUse']
+    #partial = config['enablePartial']
     #paramList = config['parametersToExplore']
     #materialFile = config['materialFileToUse']
 
@@ -31,9 +31,6 @@ def main():
     ddRun = sim.dislocationDynamicsRun(structure, testRange)
     #ddRun.checkExecutables()
     ddRun.exploreAllParams()
-
-    # To do
-    # 1. remove the manual stress range setting, just implement an algo that test small and jump to big, and step back to small
 
     #analyzer = resultsAnalyzer()
     #analyzer.plotCRSS()
