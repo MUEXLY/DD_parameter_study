@@ -53,7 +53,7 @@ The output of the simulations will be stored in the directory specified by ```da
 ## Troubleshooting
 - Ensure all paths in the configuration file are correct and accessible.
 - Verify that the MoDELib2 library and all required dependencies are properly installed.
-- Check Python error messages for clues on what might be going wrong if the script fails to run.
+- Check if the executable files are compiled and available.
 
 For further assistance or contribution, open an issue or pull request.
 
