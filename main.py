@@ -6,8 +6,6 @@ sys.path.insert(1,'./src')
 import initStructure as init
 import simulationRun as sim
 from testRange import *
-#from src import initStructure
-
 
 def main():
     # parse config file
@@ -20,7 +18,6 @@ def main():
 
     #initConfig = initializeConfig()
     ddRun = sim.dislocationDynamicsRun(structure, testRange)
-    #ddRun.checkExecutables()
     _ = ddRun.exploreAllParams()
 
     return 0;

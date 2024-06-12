@@ -5,7 +5,9 @@ testRange = {
     'alloy' : ['AlMg5'],
     'lineTension' : [1],
     'boxSize' : [
-        [400,400,3000]
+        [400,400,3000],
+        [600,600,3000],
+        [800,800,3000]
         ],
     'periodicDipoleSlipSystemIDs' : [
         '0 1',
@@ -27,10 +29,3 @@ testRange = {
         '1 200',
     ],
 }
-
-#AlMg5 mu0_SI = 28.595 [GPa]
-# AlMg10 mu0_SI = 26.784 [GPa]
-# AlMg15 mu0_SI = 24.972 [GPa]
-
-
-

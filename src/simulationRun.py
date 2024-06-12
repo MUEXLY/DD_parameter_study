@@ -48,14 +48,16 @@ class dislocationDynamicsRun:
                 templateRunDict[tempKeys[i]] = element
             paramDictList.append(templateRunDict)
 
-        # copy reference input Files to the simulation working directory
-        #self.copyReferenceInputFiles(microStructLibPath, materialLibPath, noiseLibPath, inputFilePath)
-
-        # clean up the old data
+        # clean up the old data in the simulation working directory
         if os.path.exists(f'{workingSimPath}/F'):
             os.system(f'rm -rf {workingSimPath}/F')
         if os.path.exists(f'{workingSimPath}/evl'):
             os.system(f'rm -rf {workingSimPath}/evl')
+        # clean up the old data in the data output directory
+        if os.path.exists(f'{outputPath}/F'):
+            os.system(f'rm -rf {outputPath}/F')
+        if os.path.exists(f'{outputPath}/evl'):
+            os.system(f'rm -rf {outputPath}/evl')
 
         # run simulations with the parameters saved on each list
         for parameters in paramDictList:
@@ -164,56 +166,20 @@ class dislocationDynamicsRun:
                         os.system(f'rm -rf {workingSimPath}/F')
                     if os.path.exists(f'{workingSimPath}/evl'):
                         os.system(f'rm -rf {workingSimPath}/evl')
-                    # set the stress to the upper bound and run it
-                    sigma = B * convertMPaToMu
+                    # if this is the first run, set the stress to the upper bound and move to the second iteration
+                    if iterationNumber==1:
+                        sigma = B * convertMPaToMu
+                    # if the stress is still found to be too low even at the upper bound,
+                    # add 500 MPa to the upper bound and run it again
+                    else:
+                        B += 500
+                        sigma = B * convertMPaToMu
                 else:
                     exit("something is wrong, mean dotBetaP calculation is erroneous")
 
-                # dislocation is not moving
-                #if muDotBetaP < numericalZero:
-                #    print(f'muDotBetaP = {muDotBetaP}')
-                #    _ = self.copyDataToOutputDir(parameters, outputPath, workingSimPath, microStructLibPath, microStruct, sigma/convertMPaToMu)
-                #    if os.path.exists(f'{workingSimPath}/F'):
-                #        os.system(f'rm -rf {workingSimPath}/F')
-                #    if os.path.exists(f'{workingSimPath}/evl'):
-                #        os.system(f'rm -rf {workingSimPath}/evl')
-                #    # increase the applied stress by the step size
-                #    sigma += stressStepInMPa*convertMPaToMu
-                #    continue
-                ## CRSS is found
-                #elif numericalZero < muDotBetaP < tooHighDotMu:
-                #    # increase timestep
-                #    #steps = 1000000
-                #    steps = 20000
-                #    print(f'Running more simulation until step: {steps}, muDotBetaP = {muDotBetaP}')
-                #    # increase the timestep number so that it can run simulation more
-                #    _ = self.setTimeStep(steps, modelibPath, inputFilePath)
-                #    # restart simulation
-                #    _ = self.runDislocationDynamics(parameters, modelibPath, externalLoadMode)
-                #    # save the data
-                #    _ = self.copyDataToOutputDir(parameters, outputPath, workingSimPath, microStructLibPath, microStruct, sigma/convertMPaToMu)
-                #    # save the result as a CSV file with CRSS
-                #    _ = self.saveDataInCSV(parameters, outputPath, sigma/convertMPaToMu)
-                #    break
-                ## stress is too high
-                #else:
-                #    print(f'muDotBetaP = {muDotBetaP}')
-                #    _ = self.copyDataToOutputDir(parameters, outputPath, workingSimPath, microStructLibPath, microStruct, sigma/convertMPaToMu)
-                #    if os.path.exists(f'{workingSimPath}/F'):
-                #        os.system(f'rm -rf {workingSimPath}/F')
-                #    if os.path.exists(f'{workingSimPath}/evl'):
-                #        os.system(f'rm -rf {workingSimPath}/evl')
-                #    # reduce the stress step size by half
-                #    stressStepInMPa = stressStepInMPa/2
-                #    # reduce the applied stress by the step size
-                #    sigma -= stressStepInMPa*convertMPaToMu
-                #    continue
-
     def saveData(self, parameters: dict, outputPath: str, sigmaMPa: float) -> None:
+        # data output name
         dataOutputName = 'CRSStestResult.txt'
-        # remove old data
-        #if os.path.exists(f'{outputPath}/{dataOutputName}'):
-        #    os.system(f'rm {outputPath}/{dataOutputName}')
         header, data = [], []
         for key, value in parameters.items():
             # if the value is string with ' ' delimiter, split with delim, then strip newline (\n) if there is any
@@ -280,6 +246,7 @@ class dislocationDynamicsRun:
         return value;
 
     def copyDataToOutputDir(self, parameters: dict, outputPath: str, workingSimPath: str, microStructLibPath: str,  microStructFile: str, sigmaMPa: float) -> None:
+        # create output directory if there isn't one
         if not os.path.exists(f'{outputPath}'):
             shutil.os.makedirs(f'{outputPath}')
 
@@ -383,31 +350,6 @@ class dislocationDynamicsRun:
             print(f"Execution failed after {max_attempts} attempts.")
             exit(error)
 
-    #def nonZeroBetaP(self, forceFilePath: str, convertTimeUnit: float) -> bool:
-    #    # read the data
-    #    time = 1
-    #    s13bPIndex = 5
-    #    tstep = np.loadtxt(f'{forceFilePath}/F_0.txt', usecols=time)
-    #    data = np.loadtxt(f'{forceFilePath}/F_0.txt', usecols=s13bPIndex)
-
-    #    # Calculate the index to start from (20% of the array length)
-    #    startIndex = int(len(data)*0.2)
-
-    #    # Slice the array to get the remaining 80%
-    #    trimmedData = data[startIndex:]
-    #    trimmedTstep = tstep[startIndex:]
-
-    #    # calculate the first derivative of the remaining 80% of the time-plasticStrain graph
-    #    diff = np.gradient(trimmedData, trimmedTstep*convertTimeUnit) # rate [1/s]
-    #    muDiff = np.mean(diff) # mean of the plastic strain rate [1/s]
-
-    #    tolerance = 10 # arbitrary value, if the mean of plastic strain is larger than 1000 [1/s], we found it
-    #    # return the data that is larger than the tolerance
-    #    if muDiff>tolerance:
-    #        return True;
-    #    else:
-    #        return False;
-
     def calcMeanOfDotBetaP(self, forceFilePath: str, convertTimeUnit: float) -> float:
         # read the data
         time = 1
@@ -426,46 +368,6 @@ class dislocationDynamicsRun:
         diff = np.gradient(trimmedData, trimmedTstep*convertTimeUnit) # rate [1/s]
         muDiff = np.mean(diff) # mean of the plastic strain rate [1/s]
         return muDiff
-
-    #def detectPermaDislocGlide(self, forceFilePath: str) -> bool:
-    #    # calculate the sim time unit
-    #    b_SI=0.286e-9 # burgers vector
-    #    mu0_SI=28.595428e+9 # [Pa] shear modulus
-    #    rho_SI=2700.0 # [kg/m^3] density
-    #    cs = np.sqrt(mu0_SI/rho_SI) #shear wave speed
-    #    convertTimeUnit = b_SI/cs # [sec]
-
-    #    # read the data
-    #    time = 1
-    #    s13bPIndex = 5
-    #    tstep = np.loadtxt(f'{forceFilePath}/F_0.txt', usecols=time)
-    #    data = np.loadtxt(f'{forceFilePath}/F_0.txt', usecols=s13bPIndex)
-    #    # calculate the first derivative of time-strain graph
-    #    #print(firstDiff)
-
-    #    # Calculate the index to start from (20% of the array length)
-    #    startIndex = int(len(data)*0.2)
-
-    #    # Slice the array to get the remaining 80%
-    #    trimmedData = data[startIndex:]
-    #    trimmedTstep = tstep[startIndex:]
-
-    #    # calculate the first derivative of the remaining 80% of the time-plasticStrain graph
-    #    diff = np.gradient(trimmedData, trimmedTstep*convertTimeUnit) # rate [1/s]
-    #    muDiff = np.mean(diff) # mean of the plastic strain rate [1/s]
-
-    #    print(f'data: {data}')
-    #    print(f'diff: {diff}')
-    #    exit()
-    #    tolerance = 1000 # arbitrary value, if the mean of plastic strain is larger than 1000 [1/s], we found it
-    #    # return the data that is larger than the tolerance
-    #    if muDiff>tolerance:
-    #        # found CRSS
-    #        print(f'Found CRSS at muDiff = {muDiff}')
-    #        return True;
-    #    else:
-    #        # continue the simulation
-    #        return False;
 
     def copyReferenceInputFiles(self, modelibPath: str) -> None:
         # Define the source and destination directories

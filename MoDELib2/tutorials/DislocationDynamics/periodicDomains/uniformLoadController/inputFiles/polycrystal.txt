@@ -17,7 +17,7 @@ solidSolutionNoiseFile_xz=../../../NoiseLibrary/noise_xz.vtk;
 solidSolutionNoiseFile_yz=../../../NoiseLibrary/noise_yz.vtk;
 stackingFaultNoiseMode=1; # 0=no noise
 stackingFaultCorrelationFile=../../../NoiseLibrary/AlMg5_Cx_R100_ISF.vtk;
-stackingFaultGridSize=500 500; # [m] size of SF grid on the glide plane
+stackingFaultGridSize=1200 1200; # [m] size of SF grid on the glide plane
 stackingFaultGridSpacing_SI=2.86e-10 2.86e-10; # [m] spacing of SF grid on the glide plane
 stackingFaultNoiseFile=../../../NoiseLibrary/noise_AlMg5.vtk;
 spreadLstress_A=1; # add comment

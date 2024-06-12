@@ -19,7 +19,7 @@ pf.X0=np.array([0.5,0.5,0.5]) # Centering unitCube mesh. Mesh nodes X are mapped
 pf.periodicFaceIDs=np.array([0,1,2,3,4,5])
 pf.solidSolutionNoiseMode=0
 pf.stackingFaultNoiseMode=1
-pf.stackingFaultGridSize=np.array([500,500])
+pf.stackingFaultGridSize=np.array([1200,1200])
 pf.stackingFaultCorrelationFile='../../../NoiseLibrary/AlMg5_Cx_R100_ISF.vtk'
 pf.stackingFaultNoiseFile='../../../NoiseLibrary/noise_AlMg5.vtk'
 

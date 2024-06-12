@@ -3,7 +3,7 @@
 simulationType=2; # 0=finite sample no FEM, 1=finite sample with FEM, 2=periodic images, 3=periodic fem
 useDislocations=1;
 useCracks=0;
-Nsteps=100000;
+Nsteps=10000;
 startAtTimeStep = -1;  # time step for restart. -1 means last available step in file F/F_0.txt
 
 ######################################
@@ -50,7 +50,7 @@ alphaLineTension=1.0; # dimensionless scale factor in for line tension forces
 
 ######################################
 # NETWORK REMESHING
-remeshFrequency=1; # Enable/disable node redistribution 
+remeshFrequency=0; # Enable/disable node redistribution 
 Lmin=5; # min segment length (in Burgers vector units)
 Lmax=30; # max segment length (in Burgers vector units)
 relativeAreaThreshold=0.001;
