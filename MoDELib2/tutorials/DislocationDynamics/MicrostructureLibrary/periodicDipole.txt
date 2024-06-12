@@ -1,0 +1,10 @@
+type=PeriodicDipole;
+style=individual;
+tag=pdl0;
+periodicDipoleSlipSystemIDs=0 1;
+periodicDipoleExitFaceIDs=1 1;
+periodicDipoleNodes=200 200;
+periodicDipolePoints=0 0 0
+ 0 0 0; # each row in the matrix is a the "center" of the dipole 
+periodicDipoleHeights=8000 8000;
+periodicDipoleGlideSteps=1 200;

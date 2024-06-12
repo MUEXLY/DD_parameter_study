@@ -40,7 +40,9 @@ To run the simulation script, follow these steps:
 
 2. **Modify Test Parameters**: Adjust the ```testRange``` dictionary in the ```main.py``` script to include the parameters you want to test.
 
-3. **Execute the Script**:
+3. Configure the simulation by using the reference files in the ```ReferenceInputFiles``` directory.
+
+4. **Execute the Script**:
    ```bash
    python main.py
    ```

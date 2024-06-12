@@ -1,6 +1,6 @@
 #!/bin/python3
 
-import sys, os, json
+import sys, json
 # add lib directory path
 sys.path.insert(1,'./src')
 import initStructure as init
@@ -14,28 +14,16 @@ def main():
     configFile = "config.json"
     with open(configFile) as f:
         config = json.load(f)
-    #modelibPath = config['mainMoDELibDirectory']
-    #outputPath = config['dataOutPutDirectory']
-    #totalTsteps = config['totalTimeSteps']
-    #paramToCouple = config['paramtersToCouple']
-    #microStructure = config['microstructureFileToUse']
-    #partial = config['enablePartial']
-    #paramList = config['parametersToExplore']
-    #materialFile = config['materialFileToUse']
 
     structure = init.structure(config)
-    structure.modifyInitMicrostructure()
-    #structure.changeMaterial()
+    _ = structure.modifyInitMicrostructure()
 
     #initConfig = initializeConfig()
     ddRun = sim.dislocationDynamicsRun(structure, testRange)
     #ddRun.checkExecutables()
-    ddRun.exploreAllParams()
-
-    #analyzer = resultsAnalyzer()
-    #analyzer.plotCRSS()
+    _ = ddRun.exploreAllParams()
 
     return 0;
 
 if __name__ == "__main__":
-    main()
+    _ = main()

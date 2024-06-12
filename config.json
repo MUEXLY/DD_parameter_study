@@ -1,9 +1,9 @@
 {
-    "mainMoDELibDirectory": "/home/anon/Documents/Research/Github/MoDELib2_Final/MoDELib2/",
-    "dataOutPutDirectory": "/home/anon/Documents/Research/Github/MoDELib2_Final/MoDELib2/tutorials/DislocationDynamics/periodicDomains/tensionTest/",
-    "totalTimeSteps": 20000,
+    "mainMoDELibDirectory": "./MoDELib2",
+    "dataOutPutDirectory": "./MoDELib2/tutorials/DislocationDynamics/periodicDomains/generatedData",
+    "totalTimeSteps": 10000,
     "paramtersToCouple": "",
     "microstructureFileToUse": "periodicDipole.txt",
-    "slipSystemType": "Schockley",
+    "slipSystemType": "Shockley",
     "loadType": "ExternalStress0"
 }

@@ -1,11 +1,11 @@
 #!/bin/python3
 
 testRange = {
-    'temperature' : [1],
+    'temperature' : [0],
     'alloy' : ['AlMg5'],
-    'lineTension' : [10,15,20],
+    'lineTension' : [1],
     'boxSize' : [
-        [100,100,1000]
+        [400,400,3000]
         ],
     'periodicDipoleSlipSystemIDs' : [
         '0 1',
@@ -14,16 +14,17 @@ testRange = {
         '1 1',
     ],
     'periodicDipoleNodes': [
-        '10 10',
+        '100 100',
+        '200 200',
     ],
     'periodicDipolePoints': [
-        '50 50 0\n 30 30 0',
+        '0 0 0\n 0 0 0',
     ],
     'periodicDipoleHeights': [
-        '700 700',
+        '8000 8000',
     ],
     'periodicDipoleGlideSteps': [
-        '30 60',
+        '1 200',
     ],
 }
 

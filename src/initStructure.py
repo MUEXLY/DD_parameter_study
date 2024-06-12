@@ -35,6 +35,7 @@ class structure:
                         data = f'#{line}'
                 # store original data
                 dummyData.append(data)
+
         # overwrite the original data file
         with open(f'{inputFilePath}/initialMicrostructure.txt', 'w') as g:
             for line in dummyData:
