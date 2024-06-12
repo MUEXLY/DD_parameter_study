@@ -263,10 +263,10 @@ class dislocationDynamicsRun:
         if not os.path.exists(f'{outputPath}/{dataOutputName}'):
             with open(f'{outputPath}/{dataOutputName}', 'w') as output:
                 output.write(f'{header}\n')
-                output.write(data)
+                output.write(f'{data}\n')
         else:
             with open(f'{outputPath}/{dataOutputName}', 'a') as output:
-                output.write(data)
+                output.write(f'{data}\n')
 
     def readValFromMaterialFile(self, parameter: str, libPath: str, parameters: dict) -> float:
         with open(f'{libPath}/{parameters['alloy']}.txt', 'r') as mFile:
