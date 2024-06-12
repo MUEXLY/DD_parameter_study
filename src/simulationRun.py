@@ -150,7 +150,7 @@ class dislocationDynamicsRun:
                     # next guess
                     sigma = (A+B)/2 * convertMPaToMu
                 # dislocation is not moving, stress is too low
-                elif muDotBetaP <= tooHighDotMu:
+                elif muDotBetaP <= numericalZero:
                     # set the stress to the upper bound and run it
                     sigma = B * convertMPaToMu
                 else:
