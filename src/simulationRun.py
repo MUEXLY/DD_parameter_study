@@ -17,7 +17,8 @@ class dislocationDynamicsRun:
         forceFilePath = f'{modelibPath}/tutorials/DislocationDynamics/periodicDomains/uniformLoadController/F/'
         outputPath = self.structure.configFile['dataOutPutDirectory']
         paramToCouple = self.structure.configFile['paramtersToCouple']
-        timeStep = self.structure.configFile['totalTimeSteps']
+        testTimeStep = self.structure.configFile['testTimeSteps']
+        totalTimeStep = self.structure.configFile['totalTimeSteps']
         microStruct = self.structure.configFile['microstructureFileToUse']
         workingSimPath = f'{modelibPath}/tutorials/DislocationDynamics/periodicDomains/uniformLoadController/'
         microStructLibPath = f'{modelibPath}/tutorials/DislocationDynamics/MicrostructureLibrary'
@@ -70,7 +71,7 @@ class dislocationDynamicsRun:
             # if partial is enabled, make the change on the material file
             _ = self.setSlipSystemType(parameters, materialLibPath, slipSystemType)
             # set time step
-            _ = self.setTimeStep(timeStep, modelibPath, inputFilePath)
+            _ = self.setTimeStep(testTimeStep, modelibPath, inputFilePath)
 
 
             #######################################
@@ -83,7 +84,7 @@ class dislocationDynamicsRun:
             numericalZero = 10
             tooHighDotMu = 10000
             stressStepInMPa = 20
-            initialCRSSguessMPa = 1500  # assume that the CRSS is in between 1MPa and 1500MPa
+            initialCRSSguessMPa = 200  # assume that the CRSS is in between 1MPa and 1500MPa
             # interval for bisection method
             A, B = initialStressMPa, initialCRSSguessMPa
             # applied stress value in DD, convert MPa to [mu]
@@ -131,11 +132,9 @@ class dislocationDynamicsRun:
                 # it's CRSS!
                 if numericalZero <= muDotBetaP <= tooHighDotMu:
                     # increase timestep
-                    #steps = 1000000
-                    steps = 800000
-                    print(f'Running more simulation until step: {steps}, muDotBetaP = {muDotBetaP}')
+                    print(f'Running more simulation until step: {totalTimeStep}, muDotBetaP = {muDotBetaP}')
                     # increase the timestep number so that it can run simulation more
-                    _ = self.setTimeStep(steps, modelibPath, inputFilePath)
+                    _ = self.setTimeStep(totalTimeStep, modelibPath, inputFilePath)
                     # restart simulation
                     _ = self.runDislocationDynamics(parameters, modelibPath, externalLoadMode)
                     # save the data
