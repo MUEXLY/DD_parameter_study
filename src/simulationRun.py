@@ -132,7 +132,7 @@ class dislocationDynamicsRun:
                 if numericalZero <= muDotBetaP <= tooHighDotMu:
                     # increase timestep
                     #steps = 1000000
-                    steps = 20000
+                    steps = 800000
                     print(f'Running more simulation until step: {steps}, muDotBetaP = {muDotBetaP}')
                     # increase the timestep number so that it can run simulation more
                     _ = self.setTimeStep(steps, modelibPath, inputFilePath)
