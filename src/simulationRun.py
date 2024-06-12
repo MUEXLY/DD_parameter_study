@@ -73,7 +73,6 @@ class dislocationDynamicsRun:
             # set time step
             _ = self.setTimeStep(testTimeStep, modelibPath, inputFilePath)
 
-
             #######################################
             # bisection 'like' algorithm
             ##############################################
@@ -84,7 +83,7 @@ class dislocationDynamicsRun:
             numericalZero = 10
             tooHighDotMu = 10000
             stressStepInMPa = 20
-            initialCRSSguessMPa = 200  # assume that the CRSS is in between 1MPa and 1500MPa
+            initialCRSSguessMPa = 500  # assume that the CRSS is in between 1MPa and 1500MPa
             # interval for bisection method
             A, B = initialStressMPa, initialCRSSguessMPa
             # applied stress value in DD, convert MPa to [mu]
@@ -145,12 +144,26 @@ class dislocationDynamicsRun:
                     break
                 # stress is too high
                 elif muDotBetaP >= tooHighDotMu:
+                    # save the data
+                    _ = self.copyDataToOutputDir(parameters, outputPath, workingSimPath, microStructLibPath, microStruct, sigma/convertMPaToMu)
+                    # remove old file
+                    if os.path.exists(f'{workingSimPath}/F'):
+                        os.system(f'rm -rf {workingSimPath}/F')
+                    if os.path.exists(f'{workingSimPath}/evl'):
+                        os.system(f'rm -rf {workingSimPath}/evl')
                     # update the upper boundary of the interval
                     B = (A+B)/2
                     # next guess
                     sigma = (A+B)/2 * convertMPaToMu
                 # dislocation is not moving, stress is too low
                 elif muDotBetaP <= numericalZero:
+                    # save the data
+                    _ = self.copyDataToOutputDir(parameters, outputPath, workingSimPath, microStructLibPath, microStruct, sigma/convertMPaToMu)
+                    # remove old file
+                    if os.path.exists(f'{workingSimPath}/F'):
+                        os.system(f'rm -rf {workingSimPath}/F')
+                    if os.path.exists(f'{workingSimPath}/evl'):
+                        os.system(f'rm -rf {workingSimPath}/evl')
                     # set the stress to the upper bound and run it
                     sigma = B * convertMPaToMu
                 else:
