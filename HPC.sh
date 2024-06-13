@@ -17,8 +17,8 @@ DDOMPEXE=/home/$USER/bin/apptainer_compiled/cascadelake/DDomp_cascade
 cd $SLURM_SUBMIT_DIR
 
 # copy the binaries compiled on HPC to the MoDELib2 binary directories
-cp $MICROSTRUCTEXE ./MoDELib2/tools/DDomp/build/DDomp
-cp $DDOMPEXE ./MoDELib2/tools/MicrostructureGenerator/build/microstructureGenerator
+#cp $MICROSTRUCTEXE ./MoDELib2/tools/DDomp/build/DDomp
+#cp $DDOMPEXE ./MoDELib2/tools/MicrostructureGenerator/build/microstructureGenerator
 
 # run automation script through a sandbox container
 apptainer exec $SANDBOXDIR python main.py

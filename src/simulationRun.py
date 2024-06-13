@@ -78,104 +78,148 @@ class dislocationDynamicsRun:
             #######################################
             # bisection 'like' algorithm
             ##############################################
-            convertMPaToMu = 1/(mu0_SI*10**(-6)) # conversion factor
-            initialStressMPa = 1 # initial stress guess in MPa
-            #tol=10
-            maxIter = 20 # set the max num of search
-            numericalZero = 10
-            tooHighDotMu = 10000
-            stressStepInMPa = 20
-            initialCRSSguessMPa = 500  # assume that the CRSS is in between 1MPa and 1500MPa
             # interval for bisection method
-            A, B = initialStressMPa, initialCRSSguessMPa
+            A, B = 1, 100 # assume that the CRSS is in between 1 MPa and 100 MPa initially
             # applied stress value in DD, convert MPa to [mu]
-            sigma = initialStressMPa*convertMPaToMu
-            # start searching
-            for iterationNumber in range(1, maxIter+1):
-                print(f'iteration = {iterationNumber}, sigma = {sigma/convertMPaToMu} MPa')
-                # read the uniformExternalLoadController.txt file
-                with open(f'{inputFilePath}/uniformExternalLoadController.txt', 'r') as file:
-                    text = file.read()
-                match externalLoadMode:
-                    case 'ExternalStress0':
-                        pattern = r'ExternalStress0.=((?:.|\s)*?);'
-                        replace = f'ExternalStress0 = 0.0 0.0 {sigma}\n0.0 0.0 0.0\n{sigma} 0.0 0.0;'
-                        # replace the pattern with the new value
-                        text = re.sub(pattern, replace, text)
-                    case 'ExternalStressRate':
-                        pattern = r'ExternalStressRate.=((?:.|\s)*?);'
-                        replace = f'ExternalStressRate = 0.0 0.0 {sigma}\n0.0 0.0 0.0\n{sigma} 0.0 0.0;'
-                        # replace the pattern with the new value
-                        text = re.sub(pattern, replace, text)
-                    case 'ExternalStrain0':
-                        pattern = r'ExternalStrain0.=((?:.|\s)*?);'
-                        replace = f'ExternalStrain0 = 0.0 0.0 {sigma}\n0.0 0.0 0.0\n{sigma} 0.0 0.0;'
-                        # replace the pattern with the new value
-                        text = re.sub(pattern, replace, text)
-                    case 'ExternalStrainRate':
-                        pattern = r'ExternalStrainRate.=((?:.|\s)*?);'
-                        replace = f'ExternalStrainRate = 0.0 0.0 {sigma}\n0.0 0.0 0.0\n{sigma} 0.0 0.0;'
-                        # replace the pattern with the new value
-                        text = re.sub(pattern, replace, text)
-                # overwrite the uniformExternalLoadController.txt file with the new stress
-                with open(f'{inputFilePath}/uniformExternalLoadController.txt', 'w') as file:
-                    file.write(text)
+            isCRSS = False
+            bisectionSearchSetup = {
+                'maxIter': 15, # the max number of bisection search interation before it shifts the interval
+                'numericalZero': 10, # in [1/s]
+                'tooHighDotMu': 10000, # in [1/s], if the mean of dot BetaP is over this value, stress is too high
+                'isCRSS': False,
+                'convertMPaToMu': 1/(mu0_SI*10**(-6)),
+                'inputFilePath': inputFilePath,
+                'externalLoadMode': externalLoadMode,
+                'modelibPath': modelibPath,
+                'forceFilePath': forceFilePath,
+                'workingSimPath': workingSimPath,
+                'outputPath': outputPath,
+                'microStructLibPath': microStructLibPath,
+                'microStruct': microStruct,
+                'convertTimeUnit': convertTimeUnit,
+                'testTimeStep' : testTimeStep,
+                'totalTimeStep': totalTimeStep
+            }
+            while not isCRSS:
+                # returns True if CRSS is found
+                isCRSS = self.searchCRSSthroughBisectionMethod(A, B, parameters, **bisectionSearchSetup)
+                # shift the interval 100 MPa if CRSS is not found at the initial interval
+                A += 100
+                B += 100
 
-                # generate microstructure
-                _ = self.generateMicrostructure(modelibPath)
+    def searchCRSSthroughBisectionMethod(self, A: float, B: float, parameters: dict, **kwargs) -> bool:
+        maxIter = kwargs['maxIter']
+        numericalZero = kwargs['numericalZero']
+        tooHighDotMu = kwargs['tooHighDotMu']
+        isCRSS = kwargs['isCRSS']
+        convertMPaToMu = kwargs['convertMPaToMu']
+        inputFilePath = kwargs['inputFilePath']
+        externalLoadMode = kwargs['externalLoadMode']
+        modelibPath = kwargs['modelibPath']
+        forceFilePath = kwargs['forceFilePath']
+        modelibPath = kwargs['modelibPath']
+        forceFilePath = kwargs['forceFilePath']
+        workingSimPath = kwargs['workingSimPath']
+        outputPath = kwargs['outputPath']
+        microStructLibPath = kwargs['microStructLibPath']
+        microStruct = kwargs['microStruct']
+        convertTimeUnit = kwargs['convertTimeUnit']
+        testTimeStep = kwargs['testTimeStep']
+        totalTimeStep = kwargs['totalTimeStep']
 
-                # run simulation for the number of steps in config.json file
+        # set the first stress as the lower bound
+        sigma = A*convertMPaToMu
+        # start searching
+        for iterationNumber in range(1, maxIter+1):
+            print(f'iteration = {iterationNumber}, sigma = {sigma/convertMPaToMu} MPa')
+            # read the uniformExternalLoadController.txt file
+            with open(f'{inputFilePath}/uniformExternalLoadController.txt', 'r') as file:
+                text = file.read()
+            match externalLoadMode:
+                case 'ExternalStress0':
+                    pattern = r'ExternalStress0.=((?:.|\s)*?);'
+                    replace = f'ExternalStress0 = 0.0 0.0 {sigma}\n0.0 0.0 0.0\n{sigma} 0.0 0.0;'
+                    # replace the pattern with the new value
+                    text = re.sub(pattern, replace, text)
+                case 'ExternalStressRate':
+                    pattern = r'ExternalStressRate.=((?:.|\s)*?);'
+                    replace = f'ExternalStressRate = 0.0 0.0 {sigma}\n0.0 0.0 0.0\n{sigma} 0.0 0.0;'
+                    # replace the pattern with the new value
+                    text = re.sub(pattern, replace, text)
+                case 'ExternalStrain0':
+                    pattern = r'ExternalStrain0.=((?:.|\s)*?);'
+                    replace = f'ExternalStrain0 = 0.0 0.0 {sigma}\n0.0 0.0 0.0\n{sigma} 0.0 0.0;'
+                    # replace the pattern with the new value
+                    text = re.sub(pattern, replace, text)
+                case 'ExternalStrainRate':
+                    pattern = r'ExternalStrainRate.=((?:.|\s)*?);'
+                    replace = f'ExternalStrainRate = 0.0 0.0 {sigma}\n0.0 0.0 0.0\n{sigma} 0.0 0.0;'
+                    # replace the pattern with the new value
+                    text = re.sub(pattern, replace, text)
+            # overwrite the uniformExternalLoadController.txt file with the new stress
+            with open(f'{inputFilePath}/uniformExternalLoadController.txt', 'w') as file:
+                file.write(text)
+
+            # generate microstructure
+            _ = self.generateMicrostructure(modelibPath)
+
+            # run simulation for the number of steps in config.json file
+            _ = self.runDislocationDynamics(parameters, modelibPath, externalLoadMode)
+
+            # calculate the mean dot betaP
+            muDotBetaP = self.calcMeanOfDotBetaP(forceFilePath, convertTimeUnit)
+            print(f'muDotBetaP = {muDotBetaP}')
+            # it's CRSS!
+            if numericalZero <= muDotBetaP <= tooHighDotMu:
+                # increase timestep
+                print(f'Running more simulation until step: {totalTimeStep}, muDotBetaP = {muDotBetaP}')
+                # increase the timestep number so that it can run simulation more
+                _ = self.setTimeStep(totalTimeStep, modelibPath, inputFilePath)
+                # restart simulation
                 _ = self.runDislocationDynamics(parameters, modelibPath, externalLoadMode)
-
-                # calculate the mean dot betaP
-                muDotBetaP = self.calcMeanOfDotBetaP(forceFilePath, convertTimeUnit)
-                print(f'muDotBetaP = {muDotBetaP}')
-                # it's CRSS!
-                if numericalZero <= muDotBetaP <= tooHighDotMu:
-                    # increase timestep
-                    print(f'Running more simulation until step: {totalTimeStep}, muDotBetaP = {muDotBetaP}')
-                    # increase the timestep number so that it can run simulation more
-                    _ = self.setTimeStep(totalTimeStep, modelibPath, inputFilePath)
-                    # restart simulation
-                    _ = self.runDislocationDynamics(parameters, modelibPath, externalLoadMode)
-                    # save the data
-                    _ = self.copyDataToOutputDir(parameters, outputPath, workingSimPath, microStructLibPath, microStruct, sigma/convertMPaToMu)
-                    # save the result in a separate file with CRSS and configuration info
-                    _ = self.saveData(parameters, outputPath, sigma/convertMPaToMu)
-                    # break the search loop
-                    break
-                # stress is too high
-                elif muDotBetaP >= tooHighDotMu:
-                    # save the data
-                    _ = self.copyDataToOutputDir(parameters, outputPath, workingSimPath, microStructLibPath, microStruct, sigma/convertMPaToMu)
-                    # remove old file
-                    if os.path.exists(f'{workingSimPath}/F'):
-                        os.system(f'rm -rf {workingSimPath}/F')
-                    if os.path.exists(f'{workingSimPath}/evl'):
-                        os.system(f'rm -rf {workingSimPath}/evl')
+                # save the data
+                _ = self.copyDataToOutputDir(parameters, outputPath, workingSimPath, microStructLibPath, microStruct, sigma/convertMPaToMu)
+                # save the result in a separate file with CRSS and configuration info
+                _ = self.saveData(parameters, outputPath, sigma/convertMPaToMu)
+                # set the CRSS flag to True since CRSS is found
+                isCRSS = True
+                # break the search loop
+                break
+            # stress is too high
+            elif muDotBetaP >= tooHighDotMu:
+                # save the data
+                _ = self.copyDataToOutputDir(parameters, outputPath, workingSimPath, microStructLibPath, microStruct, sigma/convertMPaToMu)
+                # remove old file
+                if os.path.exists(f'{workingSimPath}/F'):
+                    os.system(f'rm -rf {workingSimPath}/F')
+                if os.path.exists(f'{workingSimPath}/evl'):
+                    os.system(f'rm -rf {workingSimPath}/evl')
+                # update the upper boundary of the interval
+                B = (A+B)/2
+                # next guess
+                sigma = (A+B)/2 * convertMPaToMu
+            # dislocation is not moving, stress is too low
+            elif muDotBetaP <= numericalZero:
+                # save the data
+                _ = self.copyDataToOutputDir(parameters, outputPath, workingSimPath, microStructLibPath, microStruct, sigma/convertMPaToMu)
+                # remove old file
+                if os.path.exists(f'{workingSimPath}/F'):
+                    os.system(f'rm -rf {workingSimPath}/F')
+                if os.path.exists(f'{workingSimPath}/evl'):
+                    os.system(f'rm -rf {workingSimPath}/evl')
+                # if this is the first run, set the stress to the upper bound and move to the second iteration
+                if iterationNumber==1:
+                    sigma = B * convertMPaToMu
+                # if the stress is still found to be too low even at the upper bound,
+                # add 500 MPa to the upper bound and run it again
+                else:
                     # update the upper boundary of the interval
-                    B = (A+B)/2
+                    A = (A+B)/2
                     # next guess
                     sigma = (A+B)/2 * convertMPaToMu
-                # dislocation is not moving, stress is too low
-                elif muDotBetaP <= numericalZero:
-                    # save the data
-                    _ = self.copyDataToOutputDir(parameters, outputPath, workingSimPath, microStructLibPath, microStruct, sigma/convertMPaToMu)
-                    # remove old file
-                    if os.path.exists(f'{workingSimPath}/F'):
-                        os.system(f'rm -rf {workingSimPath}/F')
-                    if os.path.exists(f'{workingSimPath}/evl'):
-                        os.system(f'rm -rf {workingSimPath}/evl')
-                    # if this is the first run, set the stress to the upper bound and move to the second iteration
-                    if iterationNumber==1:
-                        sigma = B * convertMPaToMu
-                    # if the stress is still found to be too low even at the upper bound,
-                    # add 500 MPa to the upper bound and run it again
-                    else:
-                        B += 500
-                        sigma = B * convertMPaToMu
-                else:
-                    exit("something is wrong, mean dotBetaP calculation is erroneous")
+            else:
+                exit("something is wrong, mean dotBetaP calculation is erroneous")
+        return isCRSS
 
     def saveData(self, parameters: dict, outputPath: str, sigmaMPa: float) -> None:
         # data output name
@@ -351,23 +395,30 @@ class dislocationDynamicsRun:
             exit(error)
 
     def calcMeanOfDotBetaP(self, forceFilePath: str, convertTimeUnit: float) -> float:
-        # read the data
-        time = 1
-        s13bPIndex = 5
-        tstep = np.loadtxt(f'{forceFilePath}/F_0.txt', usecols=time)
-        data = np.loadtxt(f'{forceFilePath}/F_0.txt', usecols=s13bPIndex)
+        try:
+            # read the data
+            time = 1
+            s13bPIndex = 5
+            tstep = np.loadtxt(f'{forceFilePath}/F_0.txt', usecols=time)
+            data = np.loadtxt(f'{forceFilePath}/F_0.txt', usecols=s13bPIndex)
 
-        # Calculate the index to start from (20% of the array length)
-        startIndex = int(len(data)*0.2)
+            # Calculate the index to start from (20% of the array length)
+            startIndex = int(len(data)*0.2)
 
-        # Slice the array to get the remaining 80%
-        trimmedData = data[startIndex:]
-        trimmedTstep = tstep[startIndex:]
+            # Slice the array to get the remaining 80%
+            trimmedData = data[startIndex:]
+            trimmedTstep = tstep[startIndex:]
 
-        # calculate the first derivative of the remaining 80% of the time-plasticStrain graph
-        diff = np.gradient(trimmedData, trimmedTstep*convertTimeUnit) # rate [1/s]
-        muDiff = np.mean(diff) # mean of the plastic strain rate [1/s]
-        return muDiff
+            # calculate the first derivative of the remaining 80% of the time-plasticStrain graph
+            diff = np.gradient(trimmedData, trimmedTstep*convertTimeUnit) # rate [1/s]
+            muDiff = np.mean(diff) # mean of the plastic strain rate [1/s]
+            return muDiff
+        except FileNotFoundError:
+            exit(f"File not found: {forceFilePath}/F_0.txt\n Check if DDomp is executed properly")
+        except ValueError as ve:
+            exit(f"ValueError occurred: {str(ve)}")
+        except Exception as e:
+            exit(f"An unexpected error occurred: {str(e)}")
 
     def copyReferenceInputFiles(self, modelibPath: str) -> None:
         # Define the source and destination directories
