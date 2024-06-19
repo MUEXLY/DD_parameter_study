@@ -1,10 +1,11 @@
 {
     "mainMoDELibDirectory": "./MoDELib2",
     "dataOutPutDirectory": "./MoDELib2/tutorials/DislocationDynamics/periodicDomains/generatedData",
-    "testTimeSteps": 5000,
-    "totalTimeSteps": 10000,
+    "testTimeSteps": 60000,
+    "totalTimeSteps": 800000,
     "paramtersToCouple": "",
     "microstructureFileToUse": "periodicDipole.txt",
     "slipSystemType": "Shockley",
-    "loadType": "ExternalStress0"
+    "loadType": "ExternalStress0",
+    "initialGuessIntervalInMPa": [1, 60]
 }
