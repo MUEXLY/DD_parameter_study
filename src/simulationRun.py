@@ -26,6 +26,7 @@ class dislocationDynamicsRun:
         noiseLibPath = f'{modelibPath}/tutorials/DislocationDynamics/NoiseLibrary'
         externalLoadMode = self.structure.configFile['loadType']
         slipSystemType = self.structure.configFile['slipSystemType']
+        initialBisectionInterval = self.structure.configFile['initialGuessIntervalInMPa']
 
         # remove the dictionary emlements that are empty
         keysToRemove = [key for key,values in self.testRange.items() if not values] # keys to remove
@@ -79,13 +80,14 @@ class dislocationDynamicsRun:
             # bisection 'like' algorithm
             ##############################################
             # interval for bisection method
-            A, B = 1, 100 # assume that the CRSS is in between 1 MPa and 100 MPa initially
+            #A, B = 1, 100 # assume that the CRSS is in between 1 MPa and 100 MPa initially
+            A, B = initialBisectionInterval
             # applied stress value in DD, convert MPa to [mu]
             isCRSS = False
             bisectionSearchSetup = {
                 'maxIter': 15, # the max number of bisection search interation before it shifts the interval
-                'numericalZero': 10, # in [1/s]
-                'tooHighDotMu': 10000, # in [1/s], if the mean of dot BetaP is over this value, stress is too high
+                'numericalZero': 10, # in [1/s], arbitrary value
+                'tooHighDotMu': 10000, # in [1/s], if the mean of dot BetaP is over this value, stress is too high, arbitrary value
                 'isCRSS': False,
                 'convertMPaToMu': 1/(mu0_SI*10**(-6)),
                 'inputFilePath': inputFilePath,
@@ -106,8 +108,8 @@ class dislocationDynamicsRun:
                 # shift the interval 100 MPa if CRSS is not found at the initial interval
                 #A += 100
                 #B += 100
-                A = B
-                B += 100
+                A = B # search CRSS in the interval [B, B+100]
+                B += B
 
     def searchCRSSthroughBisectionMethod(self, A: float, B: float, parameters: dict, **kwargs) -> bool:
         maxIter = kwargs['maxIter']
