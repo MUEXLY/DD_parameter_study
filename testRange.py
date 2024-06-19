@@ -5,9 +5,7 @@ testRange = {
     'alloy' : ['AlMg5'],
     'lineTension' : [1],
     'boxSize' : [
-        [400,400,3000],
-        [600,600,3000],
-        [800,800,3000]
+        [500,500,3000]
         ],
     'periodicDipoleSlipSystemIDs' : [
         '0 1',
@@ -16,8 +14,7 @@ testRange = {
         '1 1',
     ],
     'periodicDipoleNodes': [
-        '100 100',
-        '200 200',
+        '150 150',
     ],
     'periodicDipolePoints': [
         '0 0 0\n 0 0 0',
@@ -27,5 +24,14 @@ testRange = {
     ],
     'periodicDipoleGlideSteps': [
         '1 200',
+    ],
+    'dxMax': [
+        1,
+        0.8,
+        0.6,
+        0.5,
+        0.3,
+        0.1,
+        0.02,
     ],
 }
