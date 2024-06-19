@@ -104,7 +104,9 @@ class dislocationDynamicsRun:
                 # returns True if CRSS is found
                 isCRSS = self.searchCRSSthroughBisectionMethod(A, B, parameters, **bisectionSearchSetup)
                 # shift the interval 100 MPa if CRSS is not found at the initial interval
-                A += 100
+                #A += 100
+                #B += 100
+                A = B
                 B += 100
 
     def searchCRSSthroughBisectionMethod(self, A: float, B: float, parameters: dict, **kwargs) -> bool:
@@ -261,6 +263,9 @@ class dislocationDynamicsRun:
                 case 'periodicDipoleGlideSteps':
                     header.append(f'dipoleGSteps')
                     data.append(f'{value}')
+                case 'dxMax':
+                    header.append(f'dxMax')
+                    data.append(f'{value}')
         # add CRSS header
         header.append(f'CRSS')
         # add CRSS
@@ -323,6 +328,8 @@ class dislocationDynamicsRun:
                     name.append(f'DH{value}')
                 case 'periodicDipoleGlideSteps':
                     name.append(f'DGS{value}')
+                case 'dxMax':
+                    name.append(f'dMx{value}')
         # join the list of strings as a single string
         folderName = ''.join(name)
 
@@ -537,6 +544,11 @@ class dislocationDynamicsRun:
                     pattern = f'periodicDipoleGlideSteps.*'
                     replace = f'periodicDipoleGlideSteps={value};'
                     filePath = f'{microStructLibPath}/periodicDipole.txt'
+                    self.modifyTXTfile(filePath, pattern, replace)
+                case 'dxMax':
+                    pattern = f'dxMax.*'
+                    replace = f'dxMax={value};'
+                    filePath = f'{inputFilePath}/DD.txt'
                     self.modifyTXTfile(filePath, pattern, replace)
 
 
