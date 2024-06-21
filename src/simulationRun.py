@@ -201,7 +201,8 @@ class dislocationDynamicsRun:
                 # update the upper boundary of the interval
                 B = (A+B)/2
                 # next guess
-                sigma = (A+B)/2 * convertMPaToMu
+                #sigma = (A+B)/2 * convertMPaToMu
+                sigma = B * convertMPaToMu
             # dislocation is not moving, stress is too low
             elif muDotBetaP <= numericalZero:
                 # save the data
@@ -217,10 +218,13 @@ class dislocationDynamicsRun:
                 # if the stress is still found to be too low even at the upper bound,
                 # add 500 MPa to the upper bound and run it again
                 else:
+                    # if it is not moving still at the upper bound, shift the interval by B
+                    A += B
+                    B += B
                     # update the upper boundary of the interval
-                    A = (A+B)/2
-                    # next guess
-                    sigma = (A+B)/2 * convertMPaToMu
+                    #A = (A+B)/2
+                    ## next guess
+                    sigma = B * convertMPaToMu
             else:
                 exit("something is wrong, mean dotBetaP calculation is erroneous")
         return isCRSS
