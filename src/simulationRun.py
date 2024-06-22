@@ -86,7 +86,7 @@ class dislocationDynamicsRun:
             isCRSS = False
             bisectionSearchSetup = {
                 'maxIter': 15, # the max number of bisection search interation before it shifts the interval
-                'numericalZero': 10, # in [1/s], arbitrary value
+                'numericalZero': 3000, # in [1/s], arbitrary value
                 'tooHighDotMu': 10000, # in [1/s], if the mean of dot BetaP is over this value, stress is too high, arbitrary value
                 'isCRSS': False,
                 'convertMPaToMu': 1/(mu0_SI*10**(-6)),
