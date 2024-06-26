@@ -415,8 +415,8 @@ class dislocationDynamicsRun:
             tstep = np.loadtxt(f'{forceFilePath}/F_0.txt', usecols=time)
             data = np.loadtxt(f'{forceFilePath}/F_0.txt', usecols=s13bPIndex)
 
-            # Calculate the index to start from (20% of the array length)
-            startIndex = int(len(data)*0.2)
+            # Calculate the index to start from (50% of the array length)
+            startIndex = int(len(data)*0.5)
 
             # Slice the array to get the remaining 80%
             trimmedData = data[startIndex:]
